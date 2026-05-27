@@ -1,19 +1,28 @@
-"use client";
-
-import { useRef, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { ArrowRight, ShieldCheck, MessageCircle, MapPin } from "lucide-react";
-import CensoForm from "./components/CensoForm";
+import fs from "fs";
+import path from "path";
+import HeroPhoto from "./components/HeroPhoto";
+
+// Verifica se o logo existe em /assets/logo.png (ou .svg)
+function logoExists(ext: string) {
+  try {
+    return fs.existsSync(
+      path.join(process.cwd(), "public", "assets", `logo.${ext}`)
+    );
+  } catch {
+    return false;
+  }
+}
 
 export default function Home() {
-  const formRef = useRef<HTMLDivElement>(null);
-  const [scrolled, setScrolled] = useState(false);
-
-  function scrollToForm() {
-    setScrolled(true);
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  const hasLogoPng = logoExists("png");
+  const hasLogoSvg = logoExists("svg");
+  const logoSrc = hasLogoPng
+    ? "/assets/logo.png"
+    : hasLogoSvg
+    ? "/assets/logo.svg"
+    : null;
 
   return (
     <main className="flex-1">
@@ -28,41 +37,55 @@ export default function Home() {
           }}
         />
 
-        <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 pt-8 md:pt-10">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-[var(--color-bordo)] flex items-center justify-center text-[#F7EFE2] font-serif text-lg">
-              M
-            </div>
-            <div className="leading-tight">
-              <div className="font-serif text-lg text-[var(--color-bordo)]">
-                Malu Fernandes
+        {/* HEADER */}
+        <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 pt-6 md:pt-10">
+          {/* Logo slot */}
+          {logoSrc ? (
+            <Image
+              src={logoSrc}
+              alt="Malu Fernandes"
+              width={160}
+              height={52}
+              className="h-10 w-auto object-contain md:h-12"
+              priority
+            />
+          ) : (
+            <div className="flex items-center gap-3">
+              {/* Placeholder até o logo chegar — substituir por <Image src="/assets/logo.png"> */}
+              <div className="h-9 w-9 rounded-full bg-[var(--color-bordo)] flex items-center justify-center text-[#F7EFE2] font-bold text-base">
+                M
               </div>
-              <div className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-marrom)]/70">
-                Mandato em Movimento
+              <div className="leading-tight">
+                <div className="font-bold text-base text-[var(--color-bordo)] tracking-tight">
+                  Malu Fernandes
+                </div>
+                <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--color-marrom)]/70">
+                  Mandato em Movimento
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
           <a
             href="#censo"
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToForm();
-            }}
-            className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-[var(--color-marrom)] hover:text-[var(--color-bordo)] transition"
+            className="hidden md:inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-bordo)] border border-[var(--color-bordo)]/30 rounded-full px-5 py-2 hover:bg-[var(--color-bordo)] hover:text-[#F7EFE2] transition-all"
           >
             Responder o Censo
             <ArrowRight className="h-4 w-4" />
           </a>
         </header>
 
-        <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-6 pt-14 pb-20 md:grid-cols-2 md:gap-16 md:pt-20 md:pb-28">
-          <div className="fade-up flex flex-col justify-center">
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--color-bordo)]/25 bg-white/50 px-4 py-1.5 text-xs uppercase tracking-[0.18em] text-[var(--color-bordo)] font-medium mb-6">
+        {/* HERO GRID */}
+        <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-5 pt-10 pb-16 md:grid-cols-2 md:gap-14 md:pt-16 md:pb-24">
+
+          {/* LEFT — copy */}
+          <div className="flex flex-col justify-center order-2 md:order-1">
+            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--color-bordo)]/25 bg-white/50 px-4 py-1.5 text-xs uppercase tracking-[0.18em] text-[var(--color-bordo)] font-semibold mb-5">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-bordo)] animate-pulse" />
               Censo da Mulher — 2026
             </span>
 
-            <h1 className="font-serif text-[44px] leading-[1.02] text-[var(--color-bordo)] md:text-[68px] md:leading-[0.98]">
+            <h1 className="font-serif text-[42px] leading-[1.02] text-[var(--color-bordo)] md:text-[62px] md:leading-[0.97]">
               Sua voz constrói
               <br />
               a saúde da
@@ -70,94 +93,43 @@ export default function Home() {
               <span className="font-display-italic text-[var(--color-caramelo)]">mulher.</span>
             </h1>
 
-            <p className="mt-7 max-w-lg text-lg leading-relaxed text-[var(--color-marrom)]/85 md:text-xl">
+            <p className="mt-6 max-w-lg text-base leading-relaxed text-[var(--color-marrom)]/85 md:text-lg">
               Saúde não pode depender de sorte. Nem de insistência. Responda o
               Censo da Mulher e ajude a transformar a rede pública do Alto Tietê
               e do Vale do Paraíba em prioridade real.
             </p>
 
-            <div className="mt-9 flex flex-wrap items-center gap-4">
-              <button
-                onClick={scrollToForm}
-                className="group inline-flex items-center gap-3 rounded-full bg-[var(--color-bordo)] px-7 py-4 text-base font-semibold text-[#F7EFE2] shadow-[0_18px_40px_-18px_rgba(107,31,43,0.7)] transition-all hover:bg-[#8A2F3D] hover:translate-y-[-1px]"
+            <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <a
+                href="#censo"
+                className="group inline-flex items-center gap-3 rounded-full bg-[var(--color-bordo)] px-7 py-4 text-base font-semibold text-[#F7EFE2] shadow-[0_18px_40px_-18px_rgba(107,31,43,0.7)] transition-all hover:bg-[#8A2F3D] hover:-translate-y-px w-full sm:w-auto justify-center"
               >
                 Quero responder
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </button>
+              </a>
               <span className="text-sm text-[var(--color-marrom)]/70">
                 Leva 2 minutos. Anônimo se você quiser.
               </span>
             </div>
 
-            <div className="mt-12 grid grid-cols-3 gap-6 max-w-md">
+            <div className="mt-10 grid grid-cols-3 gap-4 max-w-xs md:max-w-sm">
               <Stat n="11" label="Perguntas" />
               <Stat n="100%" label="Confidencial" />
               <Stat n="2min" label="Pra responder" />
             </div>
           </div>
 
-          <div className="relative">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              className="relative aspect-[4/5] w-full overflow-hidden rounded-[28px] bg-[var(--color-caramelo)] shadow-[0_40px_80px_-30px_rgba(74,44,25,0.5)]"
-            >
-              <Image
-                src="/malu.png"
-                alt="Malu Fernandes"
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 600px"
-                className="object-cover object-center"
-              />
-              <div
-                aria-hidden
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    "linear-gradient(180deg, transparent 50%, rgba(43,31,26,0.65) 100%)",
-                }}
-              />
-              <div className="absolute inset-0 flex flex-col justify-end p-7 text-[#F7EFE2]">
-                <span className="text-[11px] uppercase tracking-[0.22em] opacity-90 font-medium">
-                  Malu Fernandes
-                </span>
-                <p className="font-serif text-xl md:text-2xl leading-[1.15] mt-2 max-w-[280px]">
-                  &ldquo;Eu não vim da política.
-                  <br />
-                  Eu vim da vida real.&rdquo;
-                </p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="absolute -bottom-6 -left-4 md:-left-10 w-[220px] rounded-2xl bg-white/95 backdrop-blur p-4 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)]"
-            >
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-[var(--color-musgo)] flex items-center justify-center">
-                  <ShieldCheck className="h-5 w-5 text-[#F7EFE2]" />
-                </div>
-                <div>
-                  <div className="text-xs uppercase tracking-wider text-[var(--color-marrom)]/60">
-                    Compromisso
-                  </div>
-                  <div className="font-serif text-[var(--color-bordo)] text-base leading-tight">
-                    Saúde como prioridade
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+          {/* RIGHT — photo */}
+          <div className="order-1 md:order-2">
+            <HeroPhoto />
           </div>
         </div>
       </section>
 
+      {/* VALUE CARDS */}
       <section className="bg-[#EFE4D2] border-y border-[var(--color-areia)]/40">
-        <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-          <div className="grid gap-10 md:grid-cols-3">
+        <div className="mx-auto max-w-6xl px-5 py-14 md:py-20">
+          <div className="grid gap-6 md:grid-cols-3">
             <ValueCard
               icon={<MapPin className="h-5 w-5" />}
               kicker="Território"
@@ -180,56 +152,88 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FORM SECTION */}
       <section
         id="censo"
-        ref={formRef}
-        className="grain relative bg-[#F7EFE2] py-20 md:py-28"
+        className="grain relative bg-[#F7EFE2] py-16 md:py-24"
       >
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(40% 30% at 50% 0%, rgba(198,134,43,0.18) 0%, transparent 70%)",
+              "radial-gradient(40% 30% at 50% 0%, rgba(198,134,43,0.16) 0%, transparent 70%)",
           }}
         />
-        <div className="relative mx-auto max-w-3xl px-6">
-          <div className="text-center mb-10">
+        <div className="relative mx-auto max-w-3xl px-5">
+          <div className="text-center mb-8 md:mb-10">
             <span className="inline-block text-xs uppercase tracking-[0.22em] text-[var(--color-caramelo)] font-semibold">
               Comece agora
             </span>
-            <h2 className="mt-3 font-serif text-4xl md:text-5xl text-[var(--color-bordo)] leading-[1.05]">
+            <h2 className="mt-3 font-serif text-3xl md:text-5xl text-[var(--color-bordo)] leading-[1.05]">
               O Censo da Mulher
             </h2>
-            <p className="mt-4 text-[var(--color-marrom)]/80 max-w-xl mx-auto">
+            <p className="mt-4 text-[var(--color-marrom)]/80 max-w-xl mx-auto text-sm md:text-base">
               11 perguntas. 2 minutos. Sua resposta entra direto no mapa de
               prioridades do mandato.
             </p>
           </div>
 
-          <div className="rounded-[28px] border border-[var(--color-areia)]/50 bg-white/70 backdrop-blur px-6 py-10 md:px-10 md:py-12 shadow-[0_30px_60px_-30px_rgba(74,44,25,0.25)]">
-            <CensoForm onStart={() => setScrolled(true)} />
+          {/* ─────────────────────────────────────────────────────────
+              SHORTCODE WORDPRESS
+              Cole o shortcode do seu formulário aqui dentro.
+              Exemplo: [gravityforms id="1"] ou [contact-form-7 id="123"]
+          ───────────────────────────────────────────────────────── */}
+          <div className="rounded-[24px] border border-[var(--color-areia)]/50 bg-white/75 backdrop-blur px-5 py-8 md:px-10 md:py-10 shadow-[0_24px_48px_-24px_rgba(74,44,25,0.22)]">
+            {/* SUBSTITUA O CONTEÚDO ABAIXO PELO SEU SHORTCODE WORDPRESS */}
+            <div
+              className="min-h-[200px] flex flex-col items-center justify-center gap-3 text-center border-2 border-dashed border-[var(--color-areia)] rounded-2xl p-8"
+            >
+              <span className="text-2xl">📋</span>
+              <p className="font-semibold text-[var(--color-bordo)]">
+                Shortcode do formulário aqui
+              </p>
+              <p className="text-sm text-[var(--color-marrom)]/60 max-w-xs">
+                Cole o shortcode do WordPress no lugar deste bloco.
+                <br />
+                Ex: <code className="bg-[var(--color-bege)] px-1 rounded text-xs">[seu-shortcode]</code>
+              </p>
+            </div>
           </div>
 
-          <p className="text-center mt-8 text-xs text-[var(--color-marrom)]/60">
+          <p className="text-center mt-6 text-xs text-[var(--color-marrom)]/60">
             Ao enviar, você concorda em ser contatada pelo mandato de Malu
             Fernandes sobre temas da saúde da mulher.
           </p>
         </div>
       </section>
 
+      {/* FOOTER */}
       <footer className="bg-[var(--color-preto)] text-[#F7EFE2]/80">
-        <div className="mx-auto max-w-7xl px-6 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div>
-            <div className="font-serif text-2xl text-[#F7EFE2]">
-              Malu Fernandes
+        <div className="mx-auto max-w-7xl px-5 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+
+          {/* Logo slot */}
+          {logoSrc ? (
+            <Image
+              src={logoSrc}
+              alt="Malu Fernandes"
+              width={140}
+              height={46}
+              className="h-9 w-auto object-contain brightness-0 invert opacity-90"
+            />
+          ) : (
+            <div>
+              <div className="font-bold text-xl text-[#F7EFE2] tracking-tight">
+                Malu Fernandes
+              </div>
+              <p className="text-sm opacity-60 mt-1">
+                Mandato em Movimento — Alto Tietê &amp; Vale do Paraíba
+              </p>
             </div>
-            <p className="text-sm opacity-70 mt-1">
-              Mandato em Movimento — Alto Tietê &amp; Vale do Paraíba
-            </p>
-          </div>
+          )}
+
           <p className="text-xs opacity-60 max-w-sm">
-            {scrolled ? "Obrigada por participar." : "Sua voz constrói a saúde da mulher."}
+            Sua voz constrói a saúde da mulher.
             <br />© {new Date().getFullYear()} Mandato Malu Fernandes.
           </p>
         </div>
@@ -241,10 +245,10 @@ export default function Home() {
 function Stat({ n, label }: { n: string; label: string }) {
   return (
     <div>
-      <div className="font-serif text-3xl text-[var(--color-bordo)] leading-none">
+      <div className="font-bold text-3xl text-[var(--color-bordo)] leading-none tracking-tight">
         {n}
       </div>
-      <div className="text-xs uppercase tracking-[0.14em] text-[var(--color-marrom)]/70 mt-1.5">
+      <div className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-marrom)]/70 mt-1.5">
         {label}
       </div>
     </div>
@@ -263,17 +267,17 @@ function ValueCard({
   body: string;
 }) {
   return (
-    <div className="rounded-2xl bg-white/60 border border-[var(--color-areia)]/40 p-7">
+    <div className="rounded-2xl bg-white/60 border border-[var(--color-areia)]/40 p-6 md:p-7">
       <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-bordo)] text-[#F7EFE2] mb-5">
         {icon}
       </div>
       <div className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-caramelo)] font-semibold mb-2">
         {kicker}
       </div>
-      <h3 className="font-serif text-2xl text-[var(--color-bordo)] leading-tight mb-3">
+      <h3 className="font-bold text-xl text-[var(--color-bordo)] leading-tight mb-3 tracking-tight">
         {title}
       </h3>
-      <p className="text-[var(--color-marrom)]/80 text-[15px] leading-relaxed">
+      <p className="text-[var(--color-marrom)]/80 text-sm leading-relaxed">
         {body}
       </p>
     </div>
